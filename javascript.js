@@ -9,9 +9,9 @@ const counter = document.getElementById("counter");
 const timeGauge = document.getElementById("timeGauge");
 const progress = document.getElementById("progress");
 const scoreDiv = document.getElementById("scoreContainer");
+var userInitials;
 
-// create our questions
-let questions = [
+var questions = [
     {
         question : "What does HTML stand for?",
         imgSrc : "images/html.png",
@@ -50,20 +50,18 @@ let questions = [
     }
 ];
 
-// create some variables
 
 const lastQuestion = questions.length - 1;
-let runningQuestion = 0;
-let count = 0;
+var runningQuestion = 0;
+var count = 0;
 const questionTime = 10; // 10s
 const gaugeWidth = 150; // 150px
 const gaugeUnit = gaugeWidth / questionTime;
-let TIMER;
-let score = 0;
+var TIMER;
+var score = 0;
 
-// render a question
 function renderQuestion(){
-    let q = questions[runningQuestion];
+    var q = questions[runningQuestion];
     
     question.innerHTML = "<p>"+ q.question +"</p>";
     qImg.innerHTML = "<img src="+ q.imgSrc +">";
@@ -74,7 +72,6 @@ function renderQuestion(){
 
 start.addEventListener("click",startQuiz);
 
-// start quiz
 function startQuiz(){
     start.style.display = "none";
     renderQuestion();
@@ -84,14 +81,11 @@ function startQuiz(){
     TIMER = setInterval(renderCounter,1000); // 1000ms = 1s
 }
 
-// render progress
 function renderProgress(){
     for(let qIndex = 0; qIndex <= lastQuestion; qIndex++){
         progress.innerHTML += "<div class='prog' id="+ qIndex +"></div>";
     }
 }
-
-// counter render
 
 function renderCounter(){
     if(count <= questionTime){
@@ -100,30 +94,34 @@ function renderCounter(){
         count++
     }else{
         count = 0;
-        // change progress color to red
         answerIsWrong();
         if(runningQuestion < lastQuestion){
             runningQuestion++;
             renderQuestion();
-        }else{
-            // end the quiz and show the score
+        }else {
             clearInterval(TIMER);
             scoreRender();
+            userInitials = prompt("Enter your initials to save your score.");
+
+                var existingEntries = JSON.parse(localStorage.getItem("user"));
+                if(existingEntries == null) {existingEntries = [];
+                console.log(existingEntries);
+                var userInitials;
+                var entry = {
+                    "title" : userInitials,
+                    "text" : score 
+                };
+            }
         }
     }
 }
 
-// checkAnwer
 
 function checkAnswer(answer){
     if( answer == questions[runningQuestion].correct){
-        // answer is correct
         score++;
-        // change progress color to green
         answerIsCorrect();
     }else{
-        // answer is wrong
-        // change progress color to red
         answerIsWrong();
     }
     count = 0;
@@ -131,31 +129,25 @@ function checkAnswer(answer){
         runningQuestion++;
         renderQuestion();
     }else{
-        // end the quiz and show the score
         clearInterval(TIMER);
         scoreRender();
     }
 }
 
-// answer is correct
 function answerIsCorrect(){
     document.getElementById(runningQuestion).style.backgroundColor = "#0f0";
 }
 
-// answer is Wrong
 function answerIsWrong(){
     document.getElementById(runningQuestion).style.backgroundColor = "#f00";
 }
 
-// score render
 function scoreRender(){
     scoreDiv.style.display = "block";
     
-    // calculate the amount of question percent answered by the user
     const scorePerCent = Math.round(100 * score/questions.length);
     
-    // choose the image based on the scorePerCent
-    let img = (scorePerCent >= 80) ? "images/alberteinstein.jpg":
+    var img = (scorePerCent >= 80) ? "images/alberteinstein.jpg":
               (scorePerCent >= 60) ? "images/charlie-sheen.jpg":
               (scorePerCent >= 40) ? "images/doorknob.jpeg":
               (scorePerCent >= 20) ? "images/garybusey.jpg":
@@ -164,8 +156,6 @@ function scoreRender(){
     scoreDiv.innerHTML = "<img src="+ img +">";
     scoreDiv.innerHTML += "<p>"+ scorePerCent +"%</p>";
 }
-
-
 
 
 
